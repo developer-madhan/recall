@@ -1,2 +1,16 @@
 /* You can add global styles to this file, and also import other style files */
 @use 'tailwindcss';
+
+html,
+body {
+  margin: 0;
+  height: 100%;
+}
+
+body {
+  @apply bg-white text-slate-900;
+}
+
+html.dark body {
+  @apply bg-slate-950 text-white;
+}

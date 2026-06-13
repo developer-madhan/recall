@@ -1,4 +1,5 @@
-import { Component, EventEmitter, Output } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
+import { Component, EventEmitter, Inject, Output, PLATFORM_ID } from '@angular/core';
 
 @Component({
   selector: 'app-sidebar',
@@ -11,7 +12,13 @@ export class SidebarComponent {
   @Output() createNoteClicked = new EventEmitter<void>();
   @Output() searchChanged = new EventEmitter<string>();
 
-  darkMode = true;
+  darkMode = false;
+
+  constructor(@Inject(PLATFORM_ID) private platformId: object) {
+    if (isPlatformBrowser(this.platformId)) {
+      this.darkMode = document.documentElement.classList.contains('dark');
+    }
+  }
 
   createNote(): void {
     this.createNoteClicked.emit();
@@ -23,6 +30,9 @@ export class SidebarComponent {
 
   toggleDarkMode(): void {
     this.darkMode = !this.darkMode;
-    document.documentElement.classList.toggle('dark', this.darkMode);
+
+    if (isPlatformBrowser(this.platformId)) {
+      document.documentElement.classList.toggle('dark', this.darkMode);
+    }
   }
 }
