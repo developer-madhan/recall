@@ -1,1 +1,84 @@
-<p>sidebar works!</p>
+<div
+  class="w-64 h-full bg-slate-950 text-white border-r border-slate-800 flex flex-col"
+>
+  <!-- Logo -->
+  <div class="p-5 border-b border-slate-800">
+    <h1 class="text-2xl font-bold text-blue-500">
+      Recall
+    </h1>
+
+    <p class="text-xs text-slate-400 mt-1">
+      Offline-first Notes
+    </p>
+  </div>
+
+  <!-- New Note -->
+  <div class="p-4">
+    <button
+      (click)="createNote()"
+      class="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-lg transition"
+    >
+      + New Note
+    </button>
+  </div>
+
+  <!-- Search -->
+  <div class="px-4">
+    <input
+      type="text"
+      placeholder="Search notes..."
+      class="w-full px-3 py-2 rounded-lg bg-slate-900 border border-slate-700 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+    />
+  </div>
+
+  <!-- Navigation -->
+  <div class="flex-1 p-4 mt-4">
+    <ul class="space-y-2">
+      <li>
+        <button
+          class="w-full text-left px-3 py-2 rounded-lg hover:bg-slate-800"
+        >
+          📝 Notes
+        </button>
+      </li>
+
+      <li>
+        <button
+          class="w-full text-left px-3 py-2 rounded-lg hover:bg-slate-800"
+        >
+          📌 Pinned
+        </button>
+      </li>
+
+      <li>
+        <button
+          class="w-full text-left px-3 py-2 rounded-lg hover:bg-slate-800"
+        >
+          🗄 Archived
+        </button>
+      </li>
+    </ul>
+  </div>
+
+  <!-- Footer -->
+  <div class="border-t border-slate-800 p-4">
+    <div class="flex items-center justify-between">
+      <span class="text-sm text-slate-400">
+        Sync Status
+      </span>
+
+      <span
+        class="px-2 py-1 text-xs rounded bg-green-600"
+      >
+        Synced
+      </span>
+    </div>
+
+    <button
+      (click)="toggleDarkMode()"
+      class="mt-4 w-full border border-slate-700 rounded-lg py-2 hover:bg-slate-800"
+    >
+      🌙 Dark Mode
+    </button>
+  </div>
+</div>

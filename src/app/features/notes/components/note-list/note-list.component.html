@@ -1,1 +1,97 @@
-<p>note-list works!</p>
+<div
+  class="w-80 h-full bg-slate-900 border-r border-slate-800 flex flex-col text-white"
+>
+  <!-- Header -->
+  <div class="p-4 border-b border-slate-800">
+    <div class="flex items-center justify-between">
+      <h2 class="text-lg font-semibold">
+        Notes
+      </h2>
+
+      <button
+        (click)="createNote()"
+        class="w-8 h-8 rounded-lg bg-blue-600 hover:bg-blue-700 flex items-center justify-center"
+      >
+        +
+      </button>
+    </div>
+  </div>
+
+  <!-- Notes List -->
+  <div class="flex-1 overflow-y-auto">
+    <ng-container *ngIf="notes$ | async as notes">
+
+      <div
+        *ngIf="notes.length === 0"
+        class="flex flex-col items-center justify-center h-full text-slate-500 p-6"
+      >
+        <div class="text-5xl mb-4">📝</div>
+
+        <p>No notes yet</p>
+
+        <p class="text-sm mt-1">
+          Create your first note
+        </p>
+      </div>
+
+      <div
+        *ngFor="let note of notes; trackBy: trackByNoteId"
+        (click)="selectNote(note)"
+        class="p-4 border-b border-slate-800 cursor-pointer transition hover:bg-slate-800"
+        [ngClass]="{
+          'bg-slate-800 border-l-4 border-blue-500':
+            selectedNoteId === note.id
+        }"
+      >
+        <!-- Title -->
+        <div class="flex justify-between items-start gap-2">
+          <h3
+            class="font-medium truncate flex-1"
+          >
+            {{ note.title || 'Untitled Note' }}
+          </h3>
+
+          <button
+            (click)="deleteNote($event, note)"
+            class="text-red-400 hover:text-red-300"
+          >
+            ✕
+          </button>
+        </div>
+
+        <!-- Preview -->
+        <p
+          class="text-sm text-slate-400 mt-2 line-clamp-2"
+        >
+          {{ note.content || 'Empty note...' }}
+        </p>
+
+        <!-- Footer -->
+        <div
+          class="flex items-center justify-between mt-3 text-xs"
+        >
+          <span class="text-slate-500">
+            {{ note.updatedAt | date : 'short' }}
+          </span>
+
+          <span
+            class="px-2 py-1 rounded"
+            [ngClass]="{
+              'bg-green-700 text-green-100':
+                note.syncStatus === 'synced',
+
+              'bg-yellow-700 text-yellow-100':
+                note.syncStatus === 'pending',
+
+              'bg-red-700 text-red-100':
+                note.syncStatus === 'failed'
+            }"
+          >
+            {{ note.syncStatus }}
+          </span>
+        </div>
+      </div>
+
+    </ng-container>
+  </div>
+</div>

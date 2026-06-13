@@ -1,11 +1,53 @@
-import { Component } from '@angular/core';
+import { AsyncPipe, DatePipe, NgClass, NgFor, NgIf } from '@angular/common';
+import { Component, EventEmitter, Output } from '@angular/core';
+import { Observable, from } from 'rxjs';
+import { Note } from '../../../../core/models/note.model';
+import { NotesService } from '../../../../core/services/notes.service';
 
 @Component({
   selector: 'app-note-list',
-  imports: [],
+  standalone: true,
+  imports: [NgFor, NgIf, NgClass, AsyncPipe, DatePipe],
   templateUrl: './note-list.component.html',
-  styleUrl: './note-list.component.scss'
+  styleUrl: './note-list.component.scss',
 })
 export class NoteListComponent {
+  @Output() noteSelected = new EventEmitter<string>();
 
+  notes$: Observable<Note[]>;
+  selectedNoteId: string | null = null;
+
+  constructor(private notesService: NotesService) {
+    this.notes$ = from(this.notesService.notes$) as Observable<Note[]>;
+  }
+
+  selectNote(note: Note): void {
+    if (!note.id) return;
+
+    this.selectedNoteId = note.id;
+    this.noteSelected.emit(note.id);
+  }
+
+  async createNote(): Promise<void> {
+    const id = await this.notesService.createNote();
+
+    this.selectedNoteId = id;
+    this.noteSelected.emit(id);
+  }
+
+  async deleteNote(event: MouseEvent, note: Note): Promise<void> {
+    event.stopPropagation();
+
+    if (!note.id) return;
+
+    await this.notesService.deleteNote(note.id);
+
+    if (this.selectedNoteId === note.id) {
+      this.selectedNoteId = null;
+    }
+  }
+
+  trackByNoteId(index: number, note: Note): string {
+    return note.id ?? index.toString();
+  }
 }

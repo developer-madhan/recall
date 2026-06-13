@@ -1,16 +1,30 @@
 import Dexie, { Table } from 'dexie';
-import { Note } from '../../models/note.model';
+import {
+  ChecklistItem,
+  Note,
+  SyncQueueItem,
+  UserSettings,
+  VoiceAttachment,
+} from '../models/note.model';
 
-export class RecallDB extends Dexie {
-  notes!: Table<Note>;
+export class RecallDb extends Dexie {
+  notes!: Table<Note, string>;
+  checklistItems!: Table<ChecklistItem, string>;
+  voiceAttachments!: Table<VoiceAttachment, string>;
+  syncQueue!: Table<SyncQueueItem, string>;
+  userSettings!: Table<UserSettings, string>;
 
   constructor() {
-    super('RecallDB');
+    super('RecallDb');
 
     this.version(1).stores({
-      notes: 'id, title, updatedAt'
+      notes: 'id, title, type, isPinned, isArchived, syncStatus, createdAt, updatedAt',
+      checklistItems: 'id, noteId, completed, createdAt',
+      voiceAttachments: 'id, noteId, createdAt',
+      syncQueue: 'id, entity, entityId, action, createdAt',
+      userSettings: 'id',
     });
   }
 }
 
-export const db = new RecallDB();
+export const db = new RecallDb();

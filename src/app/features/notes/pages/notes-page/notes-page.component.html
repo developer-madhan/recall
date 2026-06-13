@@ -1,1 +1,9 @@
-<p>notes-page works!</p>
+<div class="h-screen flex bg-slate-100 dark:bg-slate-900">
+  <app-sidebar></app-sidebar>
+
+  <app-note-list
+    (noteSelected)="onNoteSelected($event)"
+  ></app-note-list>
+
+  <app-note-editor></app-note-editor>
+</div>
