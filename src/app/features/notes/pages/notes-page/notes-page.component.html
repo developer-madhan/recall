@@ -1,8 +1,12 @@
 <div class="h-screen flex bg-slate-100 dark:bg-slate-900">
-  <app-sidebar></app-sidebar>
+  <app-sidebar
+    (createNoteClicked)="createNote()"
+    (searchChanged)="onSearchChanged($event)"
+  ></app-sidebar>
 
   <app-note-list
     (noteSelected)="onNoteSelected($event)"
+    (noteDeleted)="onNoteDeleted()"
   ></app-note-list>
 
   <app-note-editor></app-note-editor>

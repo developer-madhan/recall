@@ -18,8 +18,11 @@ export class NoteEditorComponent {
   constructor(private notesService: NotesService) {}
 
   async loadNote(noteId: string): Promise<void> {
-    const note = await this.notesService.getNote(noteId);
-    this.note = note ?? null;
+    this.note = (await this.notesService.getNote(noteId)) ?? null;
+  }
+
+  clearNote(): void {
+    this.note = null;
   }
 
   scheduleSave(): void {

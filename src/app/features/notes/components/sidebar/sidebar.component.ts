@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, EventEmitter, Output } from '@angular/core';
 
 @Component({
   selector: 'app-sidebar',
@@ -8,14 +8,21 @@ import { Component } from '@angular/core';
   styleUrl: './sidebar.component.scss',
 })
 export class SidebarComponent {
-  darkMode = false;
+  @Output() createNoteClicked = new EventEmitter<void>();
+  @Output() searchChanged = new EventEmitter<string>();
 
-  createNote() {
-    console.log('Create Note');
+  darkMode = true;
+
+  createNote(): void {
+    this.createNoteClicked.emit();
   }
 
-  toggleDarkMode() {
+  onSearch(value: string): void {
+    this.searchChanged.emit(value);
+  }
+
+  toggleDarkMode(): void {
     this.darkMode = !this.darkMode;
-    document.documentElement.classList.toggle('dark');
+    document.documentElement.classList.toggle('dark', this.darkMode);
   }
 }

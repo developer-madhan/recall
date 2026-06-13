@@ -1,6 +1,6 @@
 import { AsyncPipe, DatePipe, NgClass, NgFor, NgIf } from '@angular/common';
 import { Component, EventEmitter, Output } from '@angular/core';
-import { Observable, from } from 'rxjs';
+import { Observable, BehaviorSubject, combineLatest, map } from 'rxjs';
 import { Note } from '../../../../core/models/note.model';
 import { NotesService } from '../../../../core/services/notes.service';
 
@@ -13,12 +13,34 @@ import { NotesService } from '../../../../core/services/notes.service';
 })
 export class NoteListComponent {
   @Output() noteSelected = new EventEmitter<string>();
+  @Output() noteDeleted = new EventEmitter<string>();
+
+  private searchQuery$ = new BehaviorSubject<string>('');
 
   notes$: Observable<Note[]>;
   selectedNoteId: string | null = null;
 
   constructor(private notesService: NotesService) {
-    this.notes$ = from(this.notesService.notes$) as Observable<Note[]>;
+    this.notes$ = combineLatest([
+      this.notesService.notes$,
+      this.searchQuery$,
+    ]).pipe(
+      map(([notes, query]) => {
+        const q = query.toLowerCase().trim();
+
+        if (!q) return notes;
+
+        return notes.filter(
+          note =>
+            note.title.toLowerCase().includes(q) ||
+            note.content.toLowerCase().includes(q)
+        );
+      })
+    );
+  }
+
+  search(query: string): void {
+    this.searchQuery$.next(query);
   }
 
   selectNote(note: Note): void {
@@ -44,6 +66,7 @@ export class NoteListComponent {
 
     if (this.selectedNoteId === note.id) {
       this.selectedNoteId = null;
+      this.noteDeleted.emit(note.id);
     }
   }
 

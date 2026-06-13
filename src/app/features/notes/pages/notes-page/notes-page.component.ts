@@ -6,11 +6,7 @@ import { SidebarComponent } from '../../components/sidebar/sidebar.component';
 @Component({
   selector: 'app-notes-page',
   standalone: true,
-  imports: [
-    SidebarComponent,
-    NoteListComponent,
-    NoteEditorComponent,
-  ],
+  imports: [SidebarComponent, NoteListComponent, NoteEditorComponent],
   templateUrl: './notes-page.component.html',
   styleUrl: './notes-page.component.scss',
 })
@@ -18,7 +14,22 @@ export class NotesPageComponent {
   @ViewChild(NoteEditorComponent)
   noteEditor!: NoteEditorComponent;
 
+  @ViewChild(NoteListComponent)
+  noteList!: NoteListComponent;
+
+  createNote(): void {
+    this.noteList.createNote();
+  }
+
+  onSearchChanged(query: string): void {
+    this.noteList.search(query);
+  }
+
   onNoteSelected(noteId: string): void {
     this.noteEditor.loadNote(noteId);
+  }
+
+  onNoteDeleted(): void {
+    this.noteEditor.clearNote();
   }
 }

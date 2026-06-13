@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { Observable } from 'rxjs';
 import { liveQuery } from 'dexie';
 import { db } from '../db/recall-db';
 import { Note } from '../models/note.model';
@@ -7,13 +8,16 @@ import { Note } from '../models/note.model';
   providedIn: 'root',
 })
 export class NotesService {
-  notes$ = liveQuery(() =>
-    db.notes
-      .where('isArchived')
-      .equals(0)
-      .reverse()
-      .sortBy('updatedAt')
-  );
+  notes$: Observable<Note[]> = liveQuery(async () => {
+    const notes = await db.notes
+      .filter((note) => note.isArchived === false)
+      .toArray();
+
+    return notes.sort(
+      (a, b) =>
+        new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime(),
+    );
+  }) as unknown as Observable<Note[]>;
 
   async createNote(): Promise<string> {
     const now = new Date().toISOString();
@@ -37,7 +41,7 @@ export class NotesService {
     return note.id!;
   }
 
-  async getNote(id: string): Promise<Note | undefined> {
+  getNote(id: string): Promise<Note | undefined> {
     return db.notes.get(id);
   }
 
@@ -69,39 +73,10 @@ export class NotesService {
     }
   }
 
-  async searchNotes(query: string): Promise<Note[]> {
-    const q = query.toLowerCase().trim();
-
-    if (!q) {
-      return db.notes
-        .where('isArchived')
-        .equals(0)
-        .reverse()
-        .sortBy('updatedAt');
-    }
-
-    const notes = await db.notes
-      .where('isArchived')
-      .equals(0)
-      .toArray();
-
-    return notes.filter(
-      note =>
-        note.title.toLowerCase().includes(q) ||
-        note.content.toLowerCase().includes(q)
-    );
-  }
-
-  async togglePin(note: Note): Promise<void> {
-    await this.updateNote(note.id!, {
-      isPinned: !note.isPinned,
-    });
-  }
-
   private async addToSyncQueue(
     entityId: string,
     action: 'create' | 'update' | 'delete',
-    payload: unknown
+    payload: unknown,
   ): Promise<void> {
     await db.syncQueue.add({
       id: crypto.randomUUID(),
