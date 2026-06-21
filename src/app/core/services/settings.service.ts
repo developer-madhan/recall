@@ -10,14 +10,23 @@ const SETTINGS_ID = 'default';
   providedIn: 'root',
 })
 export class SettingsService {
+  private readonly isBrowser: boolean;
   private readonly darkModeSubject = new BehaviorSubject<boolean>(false);
   readonly darkMode$: Observable<boolean> = this.darkModeSubject.asObservable();
 
-  constructor(@Inject(PLATFORM_ID) private platformId: object) {
-    void this.loadSettings();
+  constructor(@Inject(PLATFORM_ID) platformId: object) {
+    this.isBrowser = isPlatformBrowser(platformId);
+
+    if (this.isBrowser) {
+      void this.loadSettings();
+    }
   }
 
   async loadSettings(): Promise<UserSettings> {
+    if (!this.isBrowser) {
+      return { id: SETTINGS_ID, darkMode: false };
+    }
+
     const settings =
       (await db.userSettings.get(SETTINGS_ID)) ??
       (await this.createDefaultSettings());
@@ -29,6 +38,8 @@ export class SettingsService {
   }
 
   async setDarkMode(darkMode: boolean): Promise<void> {
+    if (!this.isBrowser) return;
+
     await db.userSettings.put({
       id: SETTINGS_ID,
       darkMode,
@@ -45,9 +56,7 @@ export class SettingsService {
   }
 
   private async createDefaultSettings(): Promise<UserSettings> {
-    const prefersDark =
-      isPlatformBrowser(this.platformId) &&
-      window.matchMedia?.('(prefers-color-scheme: dark)').matches;
+    const prefersDark = window.matchMedia?.('(prefers-color-scheme: dark)').matches ?? false;
 
     const settings: UserSettings = {
       id: SETTINGS_ID,
@@ -59,7 +68,7 @@ export class SettingsService {
   }
 
   private applyDarkMode(darkMode: boolean): void {
-    if (!isPlatformBrowser(this.platformId)) return;
+    if (!this.isBrowser) return;
 
     document.documentElement.classList.toggle('dark', darkMode);
   }

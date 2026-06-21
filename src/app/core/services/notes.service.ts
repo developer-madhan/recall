@@ -1,5 +1,6 @@
-import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
+import { isPlatformBrowser } from '@angular/common';
+import { Inject, Injectable, PLATFORM_ID } from '@angular/core';
+import { Observable, of } from 'rxjs';
 import { liveQuery } from 'dexie';
 import { db } from '../db/recall-db';
 import { Note } from '../models/note.model';
@@ -8,18 +9,29 @@ import { Note } from '../models/note.model';
   providedIn: 'root',
 })
 export class NotesService {
-  notes$: Observable<Note[]> = liveQuery(async () => {
-    const notes = await db.notes
-      .filter((note) => note.isArchived === false)
-      .toArray();
+  readonly notes$: Observable<Note[]>;
+  private readonly isBrowser: boolean;
 
-    return notes.sort(
-      (a, b) =>
-        new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime(),
-    );
-  }) as unknown as Observable<Note[]>;
+  constructor(@Inject(PLATFORM_ID) platformId: object) {
+    this.isBrowser = isPlatformBrowser(platformId);
+
+    this.notes$ = this.isBrowser
+      ? (liveQuery(async () => {
+          const notes = await db.notes
+            .filter((note) => note.isArchived === false)
+            .toArray();
+
+          return notes.sort(
+            (a, b) =>
+              new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime(),
+          );
+        }) as unknown as Observable<Note[]>)
+      : of([]);
+  }
 
   async createNote(): Promise<string> {
+    this.assertBrowserDb();
+
     const now = new Date().toISOString();
 
     const note: Note = {
@@ -36,16 +48,20 @@ export class NotesService {
     };
 
     await db.notes.add(note);
-    await this.addToSyncQueue(note.id!, 'create', note);
+    await this.addToSyncQueue(note.id, 'create', note);
 
-    return note.id!;
+    return note.id;
   }
 
   getNote(id: string): Promise<Note | undefined> {
+    if (!this.isBrowser) return Promise.resolve(undefined);
+
     return db.notes.get(id);
   }
 
   async updateNote(id: string, changes: Partial<Note>): Promise<void> {
+    if (!this.isBrowser) return;
+
     const updatedAt = new Date().toISOString();
 
     await db.notes.update(id, {
@@ -62,6 +78,8 @@ export class NotesService {
   }
 
   async deleteNote(id: string): Promise<void> {
+    if (!this.isBrowser) return;
+
     const note = await db.notes.get(id);
 
     await db.notes.delete(id);
@@ -78,6 +96,8 @@ export class NotesService {
     action: 'create' | 'update' | 'delete',
     payload: unknown,
   ): Promise<void> {
+    if (!this.isBrowser) return;
+
     await db.syncQueue.add({
       id: crypto.randomUUID(),
       entity: 'note',
@@ -86,5 +106,11 @@ export class NotesService {
       payload,
       createdAt: new Date().toISOString(),
     });
+  }
+
+  private assertBrowserDb(): void {
+    if (!this.isBrowser) {
+      throw new Error('IndexedDB is only available in the browser.');
+    }
   }
 }
