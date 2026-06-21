@@ -2,7 +2,7 @@ export type NoteType = 'text' | 'checklist' | 'voice';
 export type SyncStatus = 'synced' | 'pending' | 'failed';
 
 export interface Note {
-  id?: string;
+  id: string;
   title: string;
   content: string;
   type: NoteType;
@@ -15,7 +15,7 @@ export interface Note {
 }
 
 export interface ChecklistItem {
-  id?: string;
+  id: string;
   noteId: string;
   text: string;
   completed: boolean;
@@ -23,7 +23,7 @@ export interface ChecklistItem {
 }
 
 export interface VoiceAttachment {
-  id?: string;
+  id: string;
   noteId: string;
   blob: Blob;
   duration: number;
@@ -31,7 +31,7 @@ export interface VoiceAttachment {
 }
 
 export interface SyncQueueItem {
-  id?: string;
+  id: string;
   entity: 'note' | 'checklistItem' | 'voiceAttachment';
   entityId: string;
   action: 'create' | 'update' | 'delete';
@@ -40,6 +40,6 @@ export interface SyncQueueItem {
 }
 
 export interface UserSettings {
-  id?: string;
+  id: string;
   darkMode: boolean;
 }
