@@ -69,7 +69,7 @@
       (click)="toggleDarkMode()"
       class="mt-4 w-full border border-slate-700 rounded-lg py-2 hover:bg-slate-800"
     >
-      {{ darkMode ? "☀️ Light Mode" : "🌙 Dark Mode" }}
+      {{ (darkMode$ | async) ? "☀️ Light Mode" : "🌙 Dark Mode" }}
     </button>
   </div>
 </div>

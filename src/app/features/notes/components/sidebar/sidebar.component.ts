@@ -1,24 +1,21 @@
-import { isPlatformBrowser } from '@angular/common';
-import { Component, EventEmitter, Inject, Output, PLATFORM_ID } from '@angular/core';
+import { AsyncPipe } from '@angular/common';
+import { Component, EventEmitter, Output, inject } from '@angular/core';
+import { SettingsService } from '../../../../core/services/settings.service';
 
 @Component({
   selector: 'app-sidebar',
   standalone: true,
-  imports: [],
+  imports: [AsyncPipe],
   templateUrl: './sidebar.component.html',
   styleUrl: './sidebar.component.scss',
 })
 export class SidebarComponent {
+  private readonly settingsService = inject(SettingsService);
+
   @Output() createNoteClicked = new EventEmitter<void>();
   @Output() searchChanged = new EventEmitter<string>();
 
-  darkMode = false;
-
-  constructor(@Inject(PLATFORM_ID) private platformId: object) {
-    if (isPlatformBrowser(this.platformId)) {
-      this.darkMode = document.documentElement.classList.contains('dark');
-    }
-  }
+  readonly darkMode$ = this.settingsService.darkMode$;
 
   createNote(): void {
     this.createNoteClicked.emit();
@@ -28,11 +25,7 @@ export class SidebarComponent {
     this.searchChanged.emit(value);
   }
 
-  toggleDarkMode(): void {
-    this.darkMode = !this.darkMode;
-
-    if (isPlatformBrowser(this.platformId)) {
-      document.documentElement.classList.toggle('dark', this.darkMode);
-    }
+  async toggleDarkMode(): Promise<void> {
+    await this.settingsService.toggleDarkMode();
   }
 }

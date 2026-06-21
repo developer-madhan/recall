@@ -51,7 +51,7 @@
           [class.hidden]="mobileListOpen"
           [class.md:block]="true"
         >
-          <app-note-editor></app-note-editor>
+          <app-note-editor (createNoteClicked)="createNote()"></app-note-editor>
         </section>
       </div>
     </main>

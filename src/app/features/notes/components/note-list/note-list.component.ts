@@ -50,11 +50,13 @@ export class NoteListComponent {
     this.noteSelected.emit(note.id);
   }
 
-  async createNote(): Promise<void> {
+  async createNote(): Promise<string> {
     const id = await this.notesService.createNote();
 
     this.selectedNoteId = id;
     this.noteSelected.emit(id);
+
+    return id;
   }
 
   async deleteNote(event: MouseEvent, note: Note): Promise<void> {

@@ -29,8 +29,9 @@ export class NotesPageComponent {
   mobileListOpen = true;
   mobileSearchQuery = '';
 
-  createNote(): void {
-    this.noteList.createNote();
+  async createNote(): Promise<void> {
+    const noteId = await this.noteList.createNote();
+    await this.noteEditor.loadNote(noteId);
     this.mobileListOpen = false;
   }
 
@@ -38,8 +39,8 @@ export class NotesPageComponent {
     this.noteList.search(query);
   }
 
-  onNoteSelected(noteId: string): void {
-    this.noteEditor.loadNote(noteId);
+  async onNoteSelected(noteId: string): Promise<void> {
+    await this.noteEditor.loadNote(noteId);
     this.mobileListOpen = false;
   }
 
