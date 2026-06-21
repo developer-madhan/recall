@@ -1,4 +1,4 @@
-import { NgIf } from '@angular/common';
+import { DatePipe, NgIf } from '@angular/common';
 import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Note } from '../../../../core/models/note.model';
@@ -7,7 +7,7 @@ import { NotesService } from '../../../../core/services/notes.service';
 @Component({
   selector: 'app-note-editor',
   standalone: true,
-  imports: [NgIf, FormsModule],
+  imports: [NgIf, FormsModule, DatePipe],
   templateUrl: './note-editor.component.html',
   styleUrl: './note-editor.component.scss',
 })
@@ -15,7 +15,7 @@ export class NoteEditorComponent {
   note: Note | null = null;
   saveTimer: ReturnType<typeof setTimeout> | null = null;
 
-  constructor(private notesService: NotesService) {}
+  constructor(private notesService: NotesService) { }
 
   async loadNote(noteId: string): Promise<void> {
     this.note = (await this.notesService.getNote(noteId)) ?? null;

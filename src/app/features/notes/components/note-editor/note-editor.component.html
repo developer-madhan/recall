@@ -1,29 +1,38 @@
-<div class="flex-1 h-full bg-white dark:bg-slate-950 text-slate-900 dark:text-white flex flex-col">
+<div class="flex h-full flex-col bg-white text-slate-900 dark:bg-slate-950 dark:text-white">
   <ng-container *ngIf="note; else emptyState">
-    <div class="p-6 border-b border-slate-200 dark:border-slate-800">
+    <div class="border-b border-slate-200 p-4 dark:border-slate-800 sm:p-6">
       <input
         [(ngModel)]="note.title"
         (ngModelChange)="scheduleSave()"
         placeholder="Untitled note"
-        class="w-full text-3xl font-bold bg-transparent outline-none"
+        class="w-full bg-transparent text-2xl font-bold outline-none placeholder:text-slate-400 sm:text-4xl"
       />
 
-      <p class="text-xs text-slate-400 mt-2">
-        Last updated: {{ note.updatedAt }}
-      </p>
+      <div class="mt-3 flex flex-wrap items-center gap-2 text-xs text-slate-400">
+        <span>Last updated: {{ note.updatedAt | date : 'medium' }}</span>
+        <span class="rounded-full bg-yellow-100 px-2 py-1 text-yellow-700 dark:bg-yellow-900 dark:text-yellow-200">
+          {{ note.syncStatus }}
+        </span>
+      </div>
     </div>
 
     <textarea
       [(ngModel)]="note.content"
       (ngModelChange)="scheduleSave()"
       placeholder="Start writing..."
-      class="flex-1 w-full resize-none bg-transparent outline-none p-6 text-lg leading-8"
+      class="min-h-0 flex-1 resize-none bg-transparent p-4 text-base leading-8 outline-none placeholder:text-slate-400 sm:p-6 sm:text-lg"
     ></textarea>
   </ng-container>
 
   <ng-template #emptyState>
-    <div class="flex-1 flex items-center justify-center text-slate-400">
-      Select or create a note to start writing
+    <div class="flex flex-1 items-center justify-center p-6 text-center">
+      <div>
+        <div class="mb-4 text-6xl">✨</div>
+        <h2 class="text-xl font-bold">Select a note</h2>
+        <p class="mt-2 max-w-sm text-sm text-slate-500">
+          Choose a note from the list or create a new one to start writing.
+        </p>
+      </div>
     </div>
   </ng-template>
 </div>
