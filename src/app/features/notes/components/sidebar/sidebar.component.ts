@@ -1,6 +1,8 @@
 import { AsyncPipe } from '@angular/common';
 import { Component, EventEmitter, Output, inject } from '@angular/core';
 import { SettingsService } from '../../../../core/services/settings.service';
+import { OnlineStatusService } from '../../../../core/services/online-status.service';
+import { SyncService } from '../../../../core/services/sync.service';
 
 @Component({
   selector: 'app-sidebar',
@@ -11,6 +13,8 @@ import { SettingsService } from '../../../../core/services/settings.service';
 })
 export class SidebarComponent {
   private readonly settingsService = inject(SettingsService);
+  readonly onlineStatus = inject(OnlineStatusService);
+  readonly syncService = inject(SyncService);
 
   @Output() createNoteClicked = new EventEmitter<void>();
   @Output() searchChanged = new EventEmitter<string>();
